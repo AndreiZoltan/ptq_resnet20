@@ -81,7 +81,6 @@ def prepare(model, qmodel):
             weight = getattr(model, module_name).weight.data
             bias = nn.Parameter(getattr(model, module_name).bias.data)
             getattr(qmodel, module_name).set_weight_bias(weight, bias)
-            # print(getattr(model, module_name), getattr(qmodel, module_name))
 
         if isinstance(model._modules[module_name], torch.nn.Linear):
             weight = getattr(model, module_name).weight.data

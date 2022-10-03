@@ -12,7 +12,7 @@ import torch
         [torch.randn(2, 3, 32, 32), 16],
     ],
 )
-def qmodel_test(tensor, n_bits):
+def qmodel_tst(tensor, n_bits):
     qmodel = qresnet20(n_bits)
     qmodel.quantize()
     output = qmodel(tensor)

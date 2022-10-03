@@ -18,7 +18,7 @@ def build_parser():
 
 def main(args):
     model = torch.jit.load(args.path)
-    model.eval()
+    model.evaluate()
 
     dataset = CifarDS()
     valid_loader = dataset.get_valid_gen(args.n)

@@ -104,7 +104,6 @@ class ConvRelu(nn.Module):
 
     def conv(self, tensor: torch.Tensor):
         if not self.fweight.any():
-            print("KILLYOU")
             self.fweight = dequant(
                 self.weight, self.scale, self.zero_point, self.n_bits, self.w
             )

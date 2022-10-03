@@ -96,11 +96,3 @@ def load_model(path: str) -> ResNet:
 
 __all__ = ["resnet20", "load_model"]
 
-
-def test():
-    net = resnet20()
-    y = net(torch.randn(1, 3, 32, 32))
-    print(y.size())
-
-
-# test()
