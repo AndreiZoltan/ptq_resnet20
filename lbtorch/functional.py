@@ -15,40 +15,41 @@ def set_tensor_attr(
 
 
 def to_int4(tensor: torch.Tensor):
+
     missing_dims = 4 - len(tensor.shape)
     for _ in range(missing_dims):
         tensor = torch.unsqueeze(tensor, 0)
-    tensor = tensor.to(torch.int8)
-    width = tensor.shape[3] - 1
-    for w in range(tensor.shape[3]):
-        tensor[:, :, :, w // 2] &= (tensor[:, :, :, w] & 0xF) << (
-            4 * ((w + 1) % 2)
-        ) | 0xF << (4 * (w % 2))
 
-    tensor = tensor[:, :, :, : width // 2 + 1]
+    width = tensor.shape[-1]
+    tensor = tensor.to(torch.int8)
+    for i in range(tensor.shape[-1]):
+        val = tensor[:, :, :, i] & 0xF
+        tensor[:, :, :, i//2] &= (0xF << (4*(i % 2)))
+        tensor[:, :, :, i//2] |= (val << (4*((i+1) % 2)))
+    tensor = tensor[:, :, :, :width//2 + width % 2]
+
     for i in range(missing_dims):
         tensor = torch.squeeze(tensor, 0)
-    setattr(tensor, "w", width + 1)
+
     return tensor
 
 
 def to_int2(tensor: torch.Tensor):
     missing_dims = 4 - len(tensor.shape)
+    width = tensor.shape[-1]
     for _ in range(missing_dims):
         tensor = torch.unsqueeze(tensor, 0)
     tensor = tensor.to(torch.int8)
     shift = {0: 3, 1: 2, 2: 1, 3: 0}
-    fill = {0: 0x3F, 1: 0xCF, 2: 0xF3, 3: 0xFC}
-    width = tensor.shape[3] - 1
-    for w in range(tensor.shape[3]):
-        tensor[:, :, :, w // 4] &= (
-            (tensor[:, :, :, w] & 0x3) << (2 * (shift[w % 4]))
-        ) | fill[w % 4]
-
-    tensor = tensor[:, :, :, : width // 4 + 1]
+    flush = {0: 0x3F, 1: 0xCF, 2: 0xF3, 3: 0xFC}
+    for i in range(width):
+        val = tensor[:, :, :, i] & 0x3
+        tensor[:, :, :, i//4] &= flush[i % 4]
+        tensor[:, :, :, i//4] |= (val << (2*shift[i % 4]))
+    tensor = tensor[:, :, :, :width//4 + width % 4]
     for i in range(missing_dims):
         tensor = torch.squeeze(tensor, 0)
-    setattr(tensor, "w", width + 1)
+    setattr(tensor, "w", width)
     return tensor
 
 
@@ -125,7 +126,7 @@ def quant(
             return tensor
 
 
-def dequant(tensor: torch.Tensor, scale, zero_point, n_bits, w):
+def dequant(tensor: torch.Tensor, scale, zero_point, n_bits, width):
     if scale.shape[0] == 1:
         qscheme = "quantize_per_tensor"
     else:
@@ -139,21 +140,17 @@ def dequant(tensor: torch.Tensor, scale, zero_point, n_bits, w):
         tensor = torch.cat(
             (
                 tensor,
-                torch.zeros(*tensor.shape[:-1], w - tensor.shape[-1], dtype=torch.int8),
+                torch.zeros(*tensor.shape[:-1], width - tensor.shape[-1], dtype=torch.int8),
             ),
             dim=-1,
         )
         assert tensor.dtype == torch.int8  # isinstance doesn't work with torch
         shift = {0: 3, 1: 2, 2: 1, 3: 0}
-        fill = {0: 0xC0, 1: 0x30, 2: 0xC, 3: 0x3}
-        for w in range(tensor.shape[3] - 1, -1, -1):
-            val = (
-                tensor[:, :, :, w // 4]
-                & (fill[w % 4]) >> 2 * shift[w % 4]
-            )
+        for i in range(width-1, -1, -1):
+            val = (tensor[:, :, :, i//4] & (0x3 << 2*shift[i % 4])) >> (shift[i % 4])*2
             mask = torch.ge(val & (1 << 1), 1)
             val[mask] |= 0xFC
-            tensor[:, :, :, w] = val
+            tensor[:, :, :, i] = val
         for i in range(missing_dims):
             tensor = torch.squeeze(tensor, 0)
 
@@ -161,21 +158,14 @@ def dequant(tensor: torch.Tensor, scale, zero_point, n_bits, w):
         missing_dims = 4 - len(tensor.shape)
         for _ in range(missing_dims):
             tensor = torch.unsqueeze(tensor, 0)
-        tensor = torch.cat(
-            (
-                tensor,
-                torch.zeros(*tensor.shape[:-1], w - tensor.shape[-1], dtype=torch.int8),
-            ),
-            dim=-1,
-        )
-        assert tensor.dtype == torch.int8  # isinstance doesn't work with torch
-        for w in range(tensor.shape[3] - 1, -1, -1):
-            val = tensor[:, :, :, w // 2] & (
-                0xF << 4 * ((w + 1) % 2)
-            ) >> 4 * ((w + 1) % 2)
+        tensor = torch.cat((tensor, torch.zeros(*tensor.shape[:-1], width - tensor.shape[-1])), dim=-1)
+        tensor = tensor.to(torch.int8)
+        # assert tensor.dtype == torch.int8
+        for i in range(width - 1, -1, -1):
+            val = (tensor[:, :, :, i // 2] & (0xF << 4 * ((i + 1) % 2))) >> ((i + 1) % 2) * 4
             mask = torch.ge(val & (1 << 3), 1)
-            val[mask] |= 0xF << 4
-            tensor[:, :, :, w] = val
+            val[mask] |= 0xF0
+            tensor[:, :, :, i] = val
         for i in range(missing_dims):
             tensor = torch.squeeze(tensor, 0)
 

@@ -124,3 +124,21 @@ Therefore, the `state_dict` of int2x4 model can be up to 4 times smaller
 than that of int8.
 5. And finally we evaluate metrics of resulting model.
 
+The result are presented in the table below. 
+Precision, recall, f1 are presented as macro.
+They also can be calculated as micro and weighted.
+
+| metrics\\n bits | 2      | 4      | 8      | 16     |
+|-----------------|--------|--------|--------|--------|
+| Accuracy        | 0.1303 | 0.8600 | 0.9156 | 0.9153 |
+| Precision       | 0.1396 | 0.8695 | 0.9167 | 0.9166 |
+| Recall          | 0.1303 | 0.8600 | 0.9156 | 0.9153 |
+| F1              | 0.1176 | 0.8616 | 0.9159 | 0.9156 |
+
+As we see the table, the quality has dropped significantly on 2 bits.
+Most likely this is due to the not quite correct way of quantizing the weights.
+
+A continuation of this research may be the search of optimal 
+quantization for 1/2/4 bit networks 
+or for example development of the use of [XNOR approaches](https://arxiv.org/abs/1603.05279)
+for network quantization.
