@@ -95,4 +95,3 @@ def load_model(path: str) -> ResNet:
 
 
 __all__ = ["resnet20", "load_model"]
-

@@ -31,7 +31,7 @@ class QFakeStub(nn.Module):
 
     def forward(self, x: torch.Tensor):
         if self.observe:
-            self.observer(torch.clip(x, -2**15, 2**15-1))
+            self.observer(torch.clip(x, -(2**15), 2**15 - 1))
             self.update_qparams()
             return x
         else:
