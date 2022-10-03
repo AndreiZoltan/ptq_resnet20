@@ -1,3 +1,14 @@
+<div align="center">
+    A Post Training Quantization low-bit library, built on PyTorch, for developing fast and lightweight models for inference.
+    </p>
+    <hr/>
+</div>
+
+
+[![CodeFactor](https://www.codefactor.io/repository/github/andrewsultan/ptq_resnet20/badge)](https://www.codefactor.io/repository/github/andrewsultan/ptq_resnet20)
+
+[![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+
 Firstly clone the repo:
 
 `git clone https://github.com/AndrewSultan/ptq_resnet20.git`
