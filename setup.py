@@ -10,5 +10,5 @@ setup(
    name="ptq_resnet20",
    version="0.1",
    package_data={"handmade_ptq": ["py.typed"]},
-   long_description=read('README'),
+   long_description=read('README.md'),
 )

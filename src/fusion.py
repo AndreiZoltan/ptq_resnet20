@@ -73,7 +73,7 @@ def fuse_single_conv_bn_pair(block1, block2):
         return False
 
 
-def prepare2(model, qmodel):
+def prepare(model, qmodel):
     previous_name = None
 
     for module_name in model._modules:
@@ -89,6 +89,6 @@ def prepare2(model, qmodel):
             getattr(qmodel, module_name).set_weight_bias(weight, bias)
 
         if len(model._modules[module_name]._modules) > 0:
-            prepare2(model._modules[module_name], qmodel._modules[module_name])
+            prepare(model._modules[module_name], qmodel._modules[module_name])
 
     return model

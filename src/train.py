@@ -63,7 +63,7 @@ def main(args):
         valid_loader="valid",
         valid_metric="loss",
         minimize_valid_metric=True,
-        verbose=False,
+        verbose=True,
         load_best_on_end=True,
     )
 

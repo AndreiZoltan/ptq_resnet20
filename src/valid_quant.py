@@ -12,7 +12,7 @@ def build_parser():
     parser.prog = "validate model on CIFAR10"
     latest_model = max(glob("{}/*".format(QWEIGHTS_DIR)), key=os.path.getctime)
     parser.add_argument("--path", default=latest_model, type=str, help="path to model")
-    parser.add_argument("--n", default=3, type=int, help="number of batches to valid")
+    parser.add_argument("-n", default=40, type=int, help="number of batches to valid")
     return parser
 
 

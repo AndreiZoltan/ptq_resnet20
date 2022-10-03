@@ -49,7 +49,7 @@ def main(args):
     qmodel = qresnet20(8)
     # prepare
     fuse_conv_bn(model)
-    prepare2(model, qmodel)
+    prepare(model, qmodel)
     # calibrate
     fit(qmodel, 2)
     # quantize
