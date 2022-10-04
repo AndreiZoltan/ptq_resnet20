@@ -1,19 +1,6 @@
 import torch
 
 
-def set_tensor_attr(
-    tensor: torch.Tensor,
-    scale: torch.Tensor,
-    zero_point: torch.Tensor,
-    n_bits: int,
-    qscheme: str,
-):
-    setattr(tensor, "scale", scale)
-    setattr(tensor, "zero_point", zero_point)
-    setattr(tensor, "n_bits", n_bits)
-    setattr(tensor, "qscheme", qscheme)
-
-
 def to_int4(tensor: torch.Tensor):
 
     missing_dims = 4 - len(tensor.shape)
@@ -49,7 +36,6 @@ def to_int2(tensor: torch.Tensor):
     tensor = tensor[:, :, :, : width // 4 + width % 4]
     for i in range(missing_dims):
         tensor = torch.squeeze(tensor, 0)
-    setattr(tensor, "w", width)
     return tensor
 
 
@@ -83,20 +69,16 @@ def quant(
     if n_bits == 2:
         tensor = tensor.to(torch.int8)
         tensor = to_int2(tensor)
-        set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
         return tensor
     elif n_bits == 4:
         tensor = tensor.to(torch.int8)
         tensor = to_int4(tensor)
-        set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
         return tensor
     elif n_bits == 8:
         tensor = tensor.to(torch.int8)
-        set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
         return tensor
     else:
         tensor = tensor.to(torch.int16)
-        set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
         return tensor
 
 
