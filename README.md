@@ -136,7 +136,7 @@ They also can be calculated as micro and weighted.
 | F1              | 0.1176 | 0.8616 | 0.9159 | 0.9156 |
 
 As we see the table, the quality has dropped significantly on 2 bits.
-Most likely this is due to the not quite correct way of quantizing the weights.
+Most likely this is due to the not the best way of quantizing the weights.
 
 A continuation of this research may be the search of optimal 
 quantization for 1/2/4 bit networks 
