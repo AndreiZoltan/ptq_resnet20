@@ -75,55 +75,29 @@ def quant(
         tensor = torch.round(
             tensor / scale.reshape(C_out, 1, 1, 1) + zero_point.reshape(C_out, 1, 1, 1)
         )
-        if n_bits == 2:
-            tensor = torch.clip(tensor, -(2 ** (n_bits - 1)), 2 ** (n_bits - 1) - 1)
-            tensor = tensor.to(torch.int8)
-            tensor = to_int2(tensor)
-            set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
-            return tensor
-        elif n_bits == 4:
-            tensor = torch.clip(tensor, -(2 ** (n_bits - 1)), 2 ** (n_bits - 1) - 1)
-            tensor = tensor.to(torch.int8)
-            tensor = to_int4(tensor)
-            set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
-            return tensor
-        elif n_bits == 8:
-            tensor = torch.clip(tensor, -(2 ** (n_bits - 1)), 2 ** (n_bits - 1) - 1)
-            tensor = tensor.to(torch.int8)
-            set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
-            return tensor
-        else:
-            tensor = torch.clip(tensor, -(2 ** (n_bits - 1)), 2 ** (n_bits - 1) - 1)
-            tensor = tensor.to(torch.int16)
-            set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
-            return tensor
-
     else:
         tensor = torch.round(tensor / scale + zero_point)
         assert zero_point.shape[0] == 1
         assert scale.shape[0] == 1
-        if n_bits == 2:
-            tensor = torch.clip(tensor, -(2 ** (n_bits - 1)), 2 ** (n_bits - 1) - 1)
-            tensor = tensor.to(torch.int8)
-            tensor = to_int2(tensor)
-            set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
-            return tensor
-        elif n_bits == 4:
-            tensor = torch.clip(tensor, -(2 ** (n_bits - 1)), 2 ** (n_bits - 1) - 1)
-            tensor = tensor.to(torch.int8)
-            tensor = to_int4(tensor)
-            set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
-            return tensor
-        elif n_bits == 8:
-            tensor = torch.clip(tensor, -(2 ** (n_bits - 1)), 2 ** (n_bits - 1) - 1)
-            tensor = tensor.to(torch.int8)
-            set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
-            return tensor
-        else:
-            tensor = torch.clip(tensor, -(2 ** (n_bits - 1)), 2 ** (n_bits - 1) - 1)
-            tensor = tensor.to(torch.int16)
-            set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
-            return tensor
+    tensor = torch.clip(tensor, -(2 ** (n_bits - 1)), 2 ** (n_bits - 1) - 1)
+    if n_bits == 2:
+        tensor = tensor.to(torch.int8)
+        tensor = to_int2(tensor)
+        set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
+        return tensor
+    elif n_bits == 4:
+        tensor = tensor.to(torch.int8)
+        tensor = to_int4(tensor)
+        set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
+        return tensor
+    elif n_bits == 8:
+        tensor = tensor.to(torch.int8)
+        set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
+        return tensor
+    else:
+        tensor = tensor.to(torch.int16)
+        set_tensor_attr(tensor, scale, zero_point, n_bits, qscheme)
+        return tensor
 
 
 def dequant(tensor: torch.Tensor, scale, zero_point, n_bits, width):
