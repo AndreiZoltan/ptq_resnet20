@@ -4,7 +4,7 @@
 </div>
 
 
-[![CodeFactor](https://www.codefactor.io/repository/github/andrewsultan/ptq_resnet20/badge)](https://www.codefactor.io/repository/github/andrewsultan/ptq_resnet20)
+[![CodeFactor](https://www.codefactor.io/repository/github/andreizoltan/ptq_resnet20/badge)](https://www.codefactor.io/repository/github/andrewsultan/ptq_resnet20)
 
 [![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
